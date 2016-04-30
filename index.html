@@ -1,0 +1,79 @@
+<script  src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+<video 	id= "video"  
+		src="http://upload.wikimedia.org/wikipedia/commons/7/79/Big_Buck_Bunny_small.ogv">
+</video>
+<canvas id="canvas" ></canvas>
+
+
+<div id="buttonbar">
+    <button id="restart" onclick="restart();">[]</button> 
+    <button id="rew" onclick="skip(-10)">&lt;&lt;</button>
+    <button id="play" onclick="vidplay()">&gt;</button>
+    <button id="fastFwd" onclick="skip(10)">&gt;&gt;</button>
+</div>  
+
+<script type="text/javascript">
+
+    function vidplay() {
+       var video = document.getElementById("video");
+       var button = document.getElementById("play");
+       if (video.paused) {
+          video.play();
+          button.textContent = "||";
+       } else {
+          video.pause();
+          button.textContent = ">";
+       }
+    }
+
+    function restart() {
+        var video = document.getElementById("video");
+        video.currentTime = 0;
+    }
+
+    function skip(value) {
+        var video = document.getElementById("video");
+        video.currentTime += value;
+    }
+
+	function invertColor(img){
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+		//ctx.drawImage(img,0,0);
+		//ctx.drawImage(img,img.width,0);
+		var imageData = ctx.getImageData(0,0,img.width,img.height);
+		var data = imageData.data;
+		for(var i = 0; i < data.length; i+= 4){
+			data[i] 	= 255 - data[i];
+			data[i+1] 	= 255 - data[i+1];
+			data[i+2] 	= 255 - data[i+2];
+			//data[i+3] = 255 ;
+		}
+		ctx.putImageData(imageData,0,0);
+	}
+	
+	$(function() {
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+		var video = document.getElementById('video');
+
+		// set canvas size = video size when known
+		video.addEventListener('loadedmetadata', function() {
+		  canvas.width = video.videoWidth;
+		  canvas.height = video.videoHeight;
+		});
+
+		video.addEventListener('play', function() {
+		  var $this = this; //cache
+		  (function loop() {
+			if (!$this.paused && !$this.ended) {
+			  ctx.drawImage($this, 0, 0);
+			  setTimeout(loop, 1000 / 30); // drawing at 30fps
+			}
+		  })();
+		}, 0);
+	})
+	
+	
+</script>
